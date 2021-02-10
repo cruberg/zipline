@@ -372,6 +372,18 @@ class FixedSlippage(SlippageModel):
             price + (self.spread / 2.0 * order.direction),
             order.amount
         )
+      
+# Custom slippage model
+class InstantSlippage(SlippageModel):
+    
+    def process_order(self, data, order):
+        # Use price from previous bar
+        price = data.history(order.sid, 'price', 2, '1d')[0]
+        
+        # Alternative: Use current bar's open, instead of close
+        # price = data.current(order.sid, 'open')
+
+        return (price, order.amount)
 
 
 class MarketImpactBase(SlippageModel):
